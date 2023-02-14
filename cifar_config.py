@@ -10,7 +10,7 @@ class Config:
     num_classes = 100
 
     epochs = 200
-    batch_size = 128
+    batch_size = 64
     lr = 0.1
     num_workers = 4
 
