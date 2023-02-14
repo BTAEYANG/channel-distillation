@@ -153,7 +153,7 @@ def main():
                 "epoch": epoch,
                 "acc": prec1,
                 "loss": loss,
-                "lr": optimizer.state_dict()['param_groups'][0]['lr'],
+                "lr": scheduler.get_last_lr(),
                 "model_state_dict": net.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
                 "scheduler_state_dict": scheduler.state_dict(),
