@@ -142,10 +142,10 @@ def main():
     for epoch in range(start_epoch, Config.epochs + 1):
         prec1, prec5, loss = train(train_loader, net, criterion, optimizer, scheduler,
                                    epoch, logger)
-        logger.info(f"----train----: epoch {epoch:0>3d}, top1 acc: {prec1:.2f}%, top5 acc: {prec5:.2f}% \t\n")
+        logger.info(f"----train----: epoch {epoch:0>3d}, top1 acc: {prec1.item():.2f}%, top5 acc: {prec5.item():.2f}% \t\n")
 
         prec1, prec5 = validate(val_loader, net)
-        logger.info(f"====val====: epoch {epoch:0>3d}, top1 acc: {prec1:.2f}%, top5 acc: {prec5:.2f}% \t\n")
+        logger.info(f"====val====: epoch {epoch:0>3d}, top1 acc: {prec1.item():.2f}%, top5 acc: {prec5.item():.2f}% \t\n")
 
         # remember best prec@1 and save checkpoint
         torch.save(
@@ -228,7 +228,7 @@ def train(train_loader, net, criterion, optimizer, scheduler, epoch, logger):
         inputs, labels = prefetcher.next()
 
         if iter % 20 == 0:
-            loss_log = f"epoch: {epoch:0>3d}, iter: [{iter:0>4d}/{iters:0>4d}], lr: {scheduler.get_last_lr():.5f }"
+            loss_log = f"epoch: {epoch:0>3d}, iter: [{iter:0>4d}/{iters:0>4d}], lr: {optimizer.state_dict()['param_groups'][0]['lr']:.5f }"
             loss_log += f"top1 acc: {prec1.item():.2f}%, top5 acc: {prec5.item():.2f}% "
             loss_log += f"loss_total: {loss.item():3f}"
             # for i, loss_item in enumerate(Config.loss_list):
