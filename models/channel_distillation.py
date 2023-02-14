@@ -85,7 +85,7 @@ class ChannelDistillResNet_32x4_8x4(nn.Module):
         self.student = resnet8x4(num_classes=num_classes)
         self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
 
-        self.s_t_pair = [(16, 16), (16, 16), (32, 32), (64, 64)]
+        self.s_t_pair = [(32, 32), (64, 64), (128, 128), (256, 256)]
         self.connector = nn.ModuleList(
             [conv1x1_bn(s, t) for s, t in self.s_t_pair])
         # freeze teacher
