@@ -153,7 +153,7 @@ def main():
                 "epoch": epoch,
                 "acc": prec1,
                 "loss": loss,
-                "lr": scheduler.get_last_lr(),
+                "lr": scheduler.get_lr()[0],
                 "model_state_dict": net.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
                 "scheduler_state_dict": scheduler.state_dict(),
@@ -228,7 +228,7 @@ def train(train_loader, net, criterion, optimizer, scheduler, epoch, logger):
         inputs, labels = prefetcher.next()
 
         if iter % 20 == 0:
-            loss_log = f"epoch: {epoch:0>3d}, iter: [{iter:0>4d}/{iters:0>4d}], lr: {scheduler.get_last_lr():.5f }"
+            loss_log = f"epoch: {epoch:0>3d}, iter: [{iter:0>4d}/{iters:0>4d}], lr: {scheduler.get_lr()[0]:.5f }"
             loss_log += f"top1 acc: {prec1.item():.2f}%, top5 acc: {prec5.item():.2f}% "
             loss_log += f"loss_total: {loss.item():3f}"
             # for i, loss_item in enumerate(Config.loss_list):
