@@ -4,8 +4,8 @@ class Config:
     resume = "./checkpoints/latest.pth"
     evaluate = None
     dataset_type = "cifar"
-    train_dataset_path = './data/CIFAR100'
-    val_dataset_path = './data/CIFAR100'
+    train_dataset_path = '/home/lab265/lab265/datasets/CIFAR100'
+    val_dataset_path = '/home/lab265/lab265/datasets/CIFAR100'
 
     num_classes = 100
 
