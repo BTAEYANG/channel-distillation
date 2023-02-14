@@ -211,7 +211,7 @@ def train(train_loader, net, criterion, optimizer, scheduler, epoch, logger):
             elif loss_type == "kdv2_family":
                 tmp_loss = loss_alphas[i] * criterion[i](stu_outputs[-1], tea_outputs[-1], labels)
             elif loss_type == "fd_family":
-                tmp_loss = loss_alphas[i] * criterion[i](stu_outputs[:-1], tea_outputs[:-1])
+                tmp_loss = loss_alphas[i] * criterion[i](stu_outputs[:-2], tea_outputs[:-2])
 
             loss_detail.append(tmp_loss.item())
             loss_ams[i].update(tmp_loss.item(), inputs.size(0))
