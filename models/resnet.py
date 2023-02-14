@@ -2,9 +2,7 @@ import torch
 import torch.nn as nn
 from torch.hub import load_state_dict_from_url
 
-
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152']
-
 
 model_urls = {
     'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',  # for imagenet
@@ -284,3 +282,11 @@ def resnet152(pretrained=False, progress=True, **kwargs):
     """
     return _resnet('resnet152', Bottleneck, [3, 8, 36, 3], pretrained, progress,
                    **kwargs)
+
+
+if __name__ == '__main__':
+    x = torch.randn(2, 3, 32, 32)
+    net = resnet152(num_classes=100, inter_layer=True, dataset_type='cifar')
+    feats = net(x)
+    for f in feats:
+        print(f.shape)

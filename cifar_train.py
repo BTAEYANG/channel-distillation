@@ -14,7 +14,7 @@ from torch.optim import SGD
 
 from cifar_config import Config
 import losses
-from models.channel_distillation import ChannelDistillResNet50152
+from models.channel_distillation import ChannelDistillResNet50152, ChannelDistillResNet_32x4_8x4
 from utils.average_meter import AverageMeter
 from utils.data_prefetcher import DataPrefetcher
 from utils.logutil import get_logger
@@ -89,7 +89,8 @@ def main():
     logger.info("finish loading data")
 
     # network
-    net = ChannelDistillResNet50152(Config.num_classes, Config.dataset_type)
+    # net = ChannelDistillResNet50152(Config.num_classes, Config.dataset_type)
+    net = ChannelDistillResNet_32x4_8x4(num_classes=Config.num_classes, pth_path=Config.pth_path)
     net = nn.DataParallel(net).cuda()
 
     # loss and optimizer
