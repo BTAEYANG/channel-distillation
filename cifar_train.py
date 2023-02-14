@@ -228,12 +228,10 @@ def train(train_loader, net, criterion, optimizer, scheduler, epoch, logger):
         inputs, labels = prefetcher.next()
 
         if iter % 20 == 0:
-            loss_log = f"train: epoch {epoch:0>3d}, iter [{iter:0>4d}, {iters:0>4d}], lr: {scheduler.get_lr()[0]:.6f}, "
-            loss_log += f"top1 acc: {prec1:.2f}%, top5 acc: {prec5:.2f}%, "
-            loss_log += f"loss_total: {loss.item():3f}, "
-            for i, loss_item in enumerate(Config.loss_list):
-                loss_name = loss_item["loss_name"]
-                loss_log += f"{loss_name}: {loss_detail[i]:3f}, alpha: {loss_alphas[i]:3f}, "
+            loss_log = f"train: epoch {epoch:0>3d}, iter [{iter:0>4d}, {iters:0>4d}], lr: {scheduler.get_lr()[0]:.6f}, top1 acc: {prec1:.2f}%, top5 acc: {prec5:.2f}%, loss_total: {loss.item():3f}, "
+            # for i, loss_item in enumerate(Config.loss_list):
+            #     loss_name = loss_item["loss_name"]
+            #     loss_log += f"{loss_name}: {loss_detail[i]:3f}, alpha: {loss_alphas[i]:3f}, "
             logger.info(loss_log)
 
         iter += 1
