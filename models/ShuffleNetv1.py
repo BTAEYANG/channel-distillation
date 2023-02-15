@@ -108,9 +108,9 @@ class ShuffleNet(nn.Module):
 
         if is_feat:
             if preact:
-                return [f0, f1_pre, f2_pre, f3_pre, f4], out
+                return [f0, f1_pre, f2_pre, f3_pre, f4, out]
             else:
-                return [f0, f1, f2, f3, f4], out
+                return [f0, f1, f2, f3, f4, out]
         else:
             return out
 
