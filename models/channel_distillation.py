@@ -175,7 +175,7 @@ class ChannelDistillWrn_40_2_40_1(nn.Module):
         self.student = wrn_40_1(num_classes=num_classes)
         self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
 
-        self.s_t_pair = [(16, 16), (16, 16), (32, 32), (64, 64)]
+        self.s_t_pair = [(16, 16), (16, 32), (32, 64), (64, 128)]
         self.connector = nn.ModuleList(
             [conv1x1_bn(s, t) for s, t in self.s_t_pair])
         # freeze teacher
