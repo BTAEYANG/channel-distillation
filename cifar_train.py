@@ -159,18 +159,18 @@ def main():
 
     start_epoch = 1
     # resume training
-    if os.path.exists(Config.resume):
-        logger.info(f"start resuming model from {Config.resume}")
-        checkpoint = torch.load(Config.resume, map_location=torch.device("cpu"))
-        start_epoch += checkpoint["epoch"]
-        net.load_state_dict(checkpoint["model_state_dict"])
-        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
-        logger.info(
-            f"finish resuming model from {Config.resume}, epoch {checkpoint['epoch']}, "
-            f"loss: {checkpoint['loss']:3f}, lr: {checkpoint['lr']:.6f}, "
-            f"top1_acc: {checkpoint['acc']}%, loss {checkpoint['loss']}%"
-        )
+    # if os.path.exists(Config.resume):
+    #     logger.info(f"start resuming model from {Config.resume}")
+    #     checkpoint = torch.load(Config.resume, map_location=torch.device("cpu"))
+    #     start_epoch += checkpoint["epoch"]
+    #     net.load_state_dict(checkpoint["model_state_dict"])
+    #     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    #     scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+    #     logger.info(
+    #         f"finish resuming model from {Config.resume}, epoch {checkpoint['epoch']}, "
+    #         f"loss: {checkpoint['loss']:3f}, lr: {checkpoint['lr']:.6f}, "
+    #         f"top1_acc: {checkpoint['acc']}%, loss {checkpoint['loss']}%"
+    #     )
 
     if not os.path.exists(Config.checkpoints):
         os.makedirs(Config.checkpoints)

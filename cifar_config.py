@@ -1,7 +1,7 @@
 class Config:
     log = "./log"  # Path to save log
     checkpoints = "./checkpoints"  # Path to store model
-    resume = None
+    resume = "./checkpoints/latest.pth"
     evaluate = None
     dataset_type = "cifar"
     train_dataset_path = '/home/lab265/lab265/datasets/CIFAR100'
