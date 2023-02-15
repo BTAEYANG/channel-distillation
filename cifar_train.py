@@ -66,7 +66,7 @@ def main():
         key: value
         for key, value in Config.__dict__.items() if not key.startswith("__")
     }
-    logger.info(f"args: {config}")
+    # logger.info(f"args: {config}")
 
     start_time = time.time()
 
