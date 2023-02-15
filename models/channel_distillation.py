@@ -219,7 +219,7 @@ class ChannelDistillResnet32x4_shuffle_v1(nn.Module):
         self.student = ShuffleV1(num_classes=num_classes)
         self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
 
-        self.s_t_pair = [(24, 24), (240, 240), (480, 480), (960, 960)]
+        self.s_t_pair = [(24, 32), (240, 64), (480, 128), (960, 256)]
         self.connector = nn.ModuleList(
             [conv1x1_bn(s, t) for s, t in self.s_t_pair])
         # freeze teacher
