@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from . import model_dict, wrn_16_2, wrn_40_1
+from . import model_dict, wrn_16_2, wrn_40_1, ShuffleV2, mobile_half
 from .ShuffleNetv1 import ShuffleV1
 from .resnet import resnet18, resnet34, resnet50, resnet152
 from .resnext import resnet20, resnet32x4, resnet8x4, resnet56, resnet32
@@ -218,8 +218,55 @@ class ChannelDistillResnet32x4_shuffle_v1(nn.Module):
         super().__init__()
         self.student = ShuffleV1(num_classes=num_classes)
         self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+        if 'resent' in pth_path:
+            self.s_t_pair = [(24, 32), (240, 64), (480, 128), (960, 256)]
+        else:
+            self.s_t_pair = [(24, 16), (240, 32), (480, 64), (960, 128)]
+        self.connector = nn.ModuleList(
+            [conv1x1_bn(s, t) for s, t in self.s_t_pair])
+        # freeze teacher
+        for m in self.teacher.parameters():
+            m.requires_grad = False
 
-        self.s_t_pair = [(24, 32), (240, 64), (480, 128), (960, 256)]
+    def forward(self, x):
+        ss = self.student(x, is_feat=True, preact=False)
+        ts = self.teacher(x, is_feat=True, preact=False)
+        for i in range(len(self.s_t_pair)):
+            ss[i] = self.connector[i](ss[i])
+
+        return ss, ts
+
+
+class ChannelDistillResnet32x4_shuffle_v2(nn.Module):
+    def __init__(self, num_classes=100, pth_path=''):
+        super().__init__()
+        self.student = ShuffleV2(num_classes=num_classes)
+        self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+
+        self.s_t_pair = [(24, 32), (116, 64), (232, 128), (464, 256)]
+        self.connector = nn.ModuleList(
+            [conv1x1_bn(s, t) for s, t in self.s_t_pair])
+        # freeze teacher
+        for m in self.teacher.parameters():
+            m.requires_grad = False
+
+    def forward(self, x):
+        ss = self.student(x, is_feat=True, preact=False)
+        ts = self.teacher(x, is_feat=True, preact=False)
+        for i in range(len(self.s_t_pair)):
+            ss[i] = self.connector[i](ss[i])
+
+        return ss, ts
+
+
+class ChannelDistillVgg13_Mobile_v2(nn.Module):
+    def __init__(self, num_classes=100, pth_path=''):
+        super().__init__()
+        self.student = mobile_half(num_classes=num_classes)
+        self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+
+        self.s_t_pair = [(16, 64), (12, 128), (16, 256), (48, 512), (160, 512)]
+
         self.connector = nn.ModuleList(
             [conv1x1_bn(s, t) for s, t in self.s_t_pair])
         # freeze teacher

@@ -17,7 +17,8 @@ from cifar_config import Config
 import losses
 from models.channel_distillation import ChannelDistillResNet50152, ChannelDistillResNet_32x4_8x4, \
     ChannelDistillResNet_56_20, ChannelDistillResNet_110_32, ChannelDistillWrn_40_2_16_2, ChannelDistillWrn_40_2_40_1, \
-    ChannelDistillVgg_13_8, ChannelDistillResnet32x4_shuffle_v1
+    ChannelDistillVgg_13_8, ChannelDistillResnet32x4_shuffle_v1, ChannelDistillResnet32x4_shuffle_v2, \
+    ChannelDistillVgg13_Mobile_v2
 from utils.average_meter import AverageMeter
 from utils.data_prefetcher import DataPrefetcher
 from utils.logutil import get_logger
@@ -131,6 +132,10 @@ def main():
         net = ChannelDistillVgg_13_8(num_classes=Config.num_classes, pth_path=opt.path_t)
     elif opt.model_s == 'ShuffleV1':
         net = ChannelDistillResnet32x4_shuffle_v1(num_classes=Config.num_classes, pth_path=opt.path_t)
+    elif opt.model_s == 'ShuffleV2':
+        net = ChannelDistillResnet32x4_shuffle_v2(num_classes=Config.num_classes, pth_path=opt.path_t)
+    elif opt.model_s == 'MobileNetV2':
+        net = ChannelDistillVgg13_Mobile_v2(num_classes=Config.num_classes, pth_path=opt.path_t)
     net = nn.DataParallel(net).cuda()
 
     # loss and optimizer
