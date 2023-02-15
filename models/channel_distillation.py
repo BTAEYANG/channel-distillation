@@ -218,7 +218,7 @@ class ChannelDistillResnet32x4_shuffle_v1(nn.Module):
         super().__init__()
         self.student = ShuffleV1(num_classes=num_classes)
         self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
-        if 'resent' in pth_path:
+        if 'resnet' in pth_path:
             self.s_t_pair = [(24, 32), (240, 64), (480, 128), (960, 256)]
         else:
             self.s_t_pair = [(24, 16), (240, 32), (480, 64), (960, 128)]
