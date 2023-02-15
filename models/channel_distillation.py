@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 from . import model_dict, wrn_16_2, wrn_40_1
+from .ShuffleNetv1 import ShuffleV1
 from .resnet import resnet18, resnet34, resnet50, resnet152
 from .resnext import resnet20, resnet32x4, resnet8x4, resnet56, resnet32
 from .vgg import vgg8
@@ -197,6 +198,28 @@ class ChannelDistillVgg_13_8(nn.Module):
         self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
 
         self.s_t_pair = [(64, 64), (128, 128), (256, 256), (512, 512), (512, 512)]
+        self.connector = nn.ModuleList(
+            [conv1x1_bn(s, t) for s, t in self.s_t_pair])
+        # freeze teacher
+        for m in self.teacher.parameters():
+            m.requires_grad = False
+
+    def forward(self, x):
+        ss = self.student(x, is_feat=True, preact=False)
+        ts = self.teacher(x, is_feat=True, preact=False)
+        for i in range(len(self.s_t_pair)):
+            ss[i] = self.connector[i](ss[i])
+
+        return ss, ts
+
+
+class ChannelDistillResnet32x4_shuffle_v1(nn.Module):
+    def __init__(self, num_classes=100, pth_path=''):
+        super().__init__()
+        self.student = ShuffleV1(num_classes=num_classes)
+        self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+
+        self.s_t_pair = [(24, 24), (240, 240), (480, 480), (960, 960)]
         self.connector = nn.ModuleList(
             [conv1x1_bn(s, t) for s, t in self.s_t_pair])
         # freeze teacher
