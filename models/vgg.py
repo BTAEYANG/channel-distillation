@@ -93,9 +93,9 @@ class VGG(nn.Module):
 
         if is_feat:
             if preact:
-                return [f0, f1_pre, f2_pre, f3_pre, f4_pre, f5], x
+                return [f0, f1_pre, f2_pre, f3_pre, f4_pre, f5, x]
             else:
-                return [f0, f1, f2, f3, f4, f5], x
+                return [f0, f1, f2, f3, f4, f5, x]
         else:
             return x
 
@@ -222,8 +222,8 @@ if __name__ == '__main__':
     import torch
 
     x = torch.randn(2, 3, 32, 32)
-    net = vgg13(num_classes=100)
-    print(net)
+    net = vgg8(num_classes=100)
+
     feats, logit = net(x, is_feat=True, preact=False)
 
     for f in feats:

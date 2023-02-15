@@ -119,7 +119,7 @@ class WideResNet(nn.Module):
                 f1 = self.block2.layer[0].bn1(f1)
                 f2 = self.block3.layer[0].bn1(f2)
                 f3 = self.bn1(f3)
-            return [f0, f1, f2, f3, f4], out
+            return [f0, f1, f2, f3, f4, out]
         else:
             return out
 
@@ -156,8 +156,8 @@ if __name__ == '__main__':
     import torch
 
     x = torch.randn(2, 3, 32, 32)
-    net = wrn_40_2(num_classes=100)
-    print(net)
+    net = wrn_40_1(num_classes=100)
+
     feats, logit = net(x, is_feat=True, preact=True)
 
     for f in feats:

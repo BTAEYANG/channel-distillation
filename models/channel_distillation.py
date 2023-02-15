@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
 
-from . import model_dict
+from . import model_dict, wrn_16_2, wrn_40_1
 from .resnet import resnet18, resnet34, resnet50, resnet152
-from .resnext import resnet20, resnet32x4, resnet8x4
+from .resnext import resnet20, resnet32x4, resnet8x4, resnet56, resnet32
+from .vgg import vgg8
 
 
 def conv1x1_bn(in_channel, out_channel):
@@ -79,6 +80,50 @@ def load_teacher(model_path, n_cls):
     return model
 
 
+class ChannelDistillResNet_56_20(nn.Module):
+    def __init__(self, num_classes=100, pth_path=''):
+        super().__init__()
+        self.student = resnet20(num_classes=num_classes)
+        self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+
+        self.s_t_pair = [(16, 16), (16, 16), (32, 32), (64, 64)]
+        self.connector = nn.ModuleList(
+            [conv1x1_bn(s, t) for s, t in self.s_t_pair])
+        # freeze teacher
+        for m in self.teacher.parameters():
+            m.requires_grad = False
+
+    def forward(self, x):
+        ss = self.student(x, is_feat=True, preact=False)
+        ts = self.teacher(x, is_feat=True, preact=False)
+        for i in range(len(self.s_t_pair)):
+            ss[i] = self.connector[i](ss[i])
+
+        return ss, ts
+
+
+class ChannelDistillResNet_110_32(nn.Module):
+    def __init__(self, num_classes=100, pth_path=''):
+        super().__init__()
+        self.student = resnet32(num_classes=num_classes)
+        self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+
+        self.s_t_pair = [(16, 16), (16, 16), (32, 32), (64, 64)]
+        self.connector = nn.ModuleList(
+            [conv1x1_bn(s, t) for s, t in self.s_t_pair])
+        # freeze teacher
+        for m in self.teacher.parameters():
+            m.requires_grad = False
+
+    def forward(self, x):
+        ss = self.student(x, is_feat=True, preact=False)
+        ts = self.teacher(x, is_feat=True, preact=False)
+        for i in range(len(self.s_t_pair)):
+            ss[i] = self.connector[i](ss[i])
+
+        return ss, ts
+
+
 class ChannelDistillResNet_32x4_8x4(nn.Module):
     def __init__(self, num_classes=100, pth_path=''):
         super().__init__()
@@ -86,6 +131,72 @@ class ChannelDistillResNet_32x4_8x4(nn.Module):
         self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
 
         self.s_t_pair = [(32, 32), (64, 64), (128, 128), (256, 256)]
+        self.connector = nn.ModuleList(
+            [conv1x1_bn(s, t) for s, t in self.s_t_pair])
+        # freeze teacher
+        for m in self.teacher.parameters():
+            m.requires_grad = False
+
+    def forward(self, x):
+        ss = self.student(x, is_feat=True, preact=False)
+        ts = self.teacher(x, is_feat=True, preact=False)
+        for i in range(len(self.s_t_pair)):
+            ss[i] = self.connector[i](ss[i])
+
+        return ss, ts
+
+
+class ChannelDistillWrn_40_2_16_2(nn.Module):
+    def __init__(self, num_classes=100, pth_path=''):
+        super().__init__()
+        self.student = wrn_16_2(num_classes=num_classes)
+        self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+
+        self.s_t_pair = [(16, 16), (32, 32), (64, 64), (128, 128)]
+        self.connector = nn.ModuleList(
+            [conv1x1_bn(s, t) for s, t in self.s_t_pair])
+        # freeze teacher
+        for m in self.teacher.parameters():
+            m.requires_grad = False
+
+    def forward(self, x):
+        ss = self.student(x, is_feat=True, preact=False)
+        ts = self.teacher(x, is_feat=True, preact=False)
+        for i in range(len(self.s_t_pair)):
+            ss[i] = self.connector[i](ss[i])
+
+        return ss, ts
+
+
+class ChannelDistillWrn_40_2_40_1(nn.Module):
+    def __init__(self, num_classes=100, pth_path=''):
+        super().__init__()
+        self.student = wrn_40_1(num_classes=num_classes)
+        self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+
+        self.s_t_pair = [(16, 16), (16, 16), (32, 32), (64, 64)]
+        self.connector = nn.ModuleList(
+            [conv1x1_bn(s, t) for s, t in self.s_t_pair])
+        # freeze teacher
+        for m in self.teacher.parameters():
+            m.requires_grad = False
+
+    def forward(self, x):
+        ss = self.student(x, is_feat=True, preact=False)
+        ts = self.teacher(x, is_feat=True, preact=False)
+        for i in range(len(self.s_t_pair)):
+            ss[i] = self.connector[i](ss[i])
+
+        return ss, ts
+
+
+class ChannelDistillVgg_13_8(nn.Module):
+    def __init__(self, num_classes=100, pth_path=''):
+        super().__init__()
+        self.student = vgg8(num_classes=num_classes)
+        self.teacher = load_teacher(model_path=pth_path, n_cls=num_classes)
+
+        self.s_t_pair = [(64, 64), (128, 128), (256, 256), (512, 512), (512, 512)]
         self.connector = nn.ModuleList(
             [conv1x1_bn(s, t) for s, t in self.s_t_pair])
         # freeze teacher

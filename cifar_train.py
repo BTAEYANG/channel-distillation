@@ -1,3 +1,4 @@
+import argparse
 import os
 import shutil
 import time
@@ -14,7 +15,9 @@ from torch.optim import SGD
 
 from cifar_config import Config
 import losses
-from models.channel_distillation import ChannelDistillResNet50152, ChannelDistillResNet_32x4_8x4
+from models.channel_distillation import ChannelDistillResNet50152, ChannelDistillResNet_32x4_8x4, \
+    ChannelDistillResNet_56_20, ChannelDistillResNet_110_32, ChannelDistillWrn_40_2_16_2, ChannelDistillWrn_40_2_40_1, \
+    ChannelDistillVgg_13_8
 from utils.average_meter import AverageMeter
 from utils.data_prefetcher import DataPrefetcher
 from utils.logutil import get_logger
@@ -22,7 +25,31 @@ from utils.metric import accuracy
 from utils.util import adjust_loss_alpha
 
 
+def parse_option():
+    parser = argparse.ArgumentParser('argument for training')
+
+    # dataset
+    parser.add_argument('--dataset', type=str, default='CIFAR100', choices=['CIFAR100', 'CIFAR10'], help='dataset')
+
+    # model
+    parser.add_argument('--model_s', type=str, default='resnet8',
+                        choices=['resnet8', 'resnet14', 'resnet20', 'resnet32', 'resnet44', 'resnet56', 'resnet110',
+                                 'resnet8x4', 'resnet32x4',
+                                 'ResNet18', 'ResNet34', 'ResNet50', 'ResNet101', 'ResNet152',
+                                 'wrn_16_1', 'wrn_16_2', 'wrn_40_1', 'wrn_40_2',
+                                 'vgg8', 'vgg11', 'vgg13', 'vgg16', 'vgg19', 'ResNet50',
+                                 'MobileNetV2', 'ShuffleV1', 'ShuffleV2'])
+    parser.add_argument('--path_t', type=str, default='./save/models/resnet32x4_vanilla/ckpt_epoch_240.pth', help='teacher model snapshot')
+
+    opt = parser.parse_args()
+
+    return opt
+
+
 def main():
+
+    opt = parse_option()
+
     if not torch.cuda.is_available():
         raise Exception("need gpu to train network!")
 
@@ -90,7 +117,18 @@ def main():
 
     # network
     # net = ChannelDistillResNet50152(Config.num_classes, Config.dataset_type)
-    net = ChannelDistillResNet_32x4_8x4(num_classes=Config.num_classes, pth_path=Config.pth_path)
+    if opt.model_s == 'resnet8x4':
+        net = ChannelDistillResNet_32x4_8x4(num_classes=Config.num_classes, pth_path=opt.path_t)
+    elif opt.model_s == 'resnet20':
+        net = ChannelDistillResNet_56_20(num_classes=Config.num_classes, pth_path=opt.path_t)
+    elif opt.model_s == 'resnet32':
+        net = ChannelDistillResNet_110_32(num_classes=Config.num_classes, pth_path=opt.path_t)
+    elif opt.model_s == 'wrn_16_2':
+        net = ChannelDistillWrn_40_2_16_2(num_classes=Config.num_classes, pth_path=opt.path_t)
+    elif opt.model_s == 'wrn_40_1':
+        net = ChannelDistillWrn_40_2_40_1(num_classes=Config.num_classes, pth_path=opt.path_t)
+    elif opt.model_s == 'vgg8':
+        net = ChannelDistillVgg_13_8(num_classes=Config.num_classes, pth_path=opt.path_t)
     net = nn.DataParallel(net).cuda()
 
     # loss and optimizer

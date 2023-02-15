@@ -6,7 +6,7 @@ class Config:
     dataset_type = "cifar"
     train_dataset_path = '/home/lab265/lab265/datasets/CIFAR100'
     val_dataset_path = '/home/lab265/lab265/datasets/CIFAR100'
-    pth_path = './save/models/resnet32x4_vanilla/ckpt_epoch_240.pth'
+
     num_classes = 100
 
     epochs = 200
